@@ -21,32 +21,18 @@ public class App
 
 
         ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(portNumber);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        serverSocket = getServerSocket();
 
         Socket clientSocket = null;
-        try {
-            clientSocket = serverSocket.accept();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        clientSocket = getClientSocket(serverSocket);
         BufferedReader in;
-        try {
-             in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        in = getBufferedReader(clientSocket);
         PrintWriter out = null;
-        try {
-             out = new PrintWriter(clientSocket.getOutputStream(),
-                    true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        out = getPrintWriter(out, clientSocket);
+        readerLoop(in, out);
+    }
+
+    private static void readerLoop(BufferedReader in, PrintWriter out) {
         String s = "";
         try {
             while ((s = in.readLine()) != null) {
@@ -57,5 +43,46 @@ public class App
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static PrintWriter getPrintWriter(PrintWriter out, Socket clientSocket) {
+        try {
+             out = new PrintWriter(clientSocket.getOutputStream(),
+                    true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    private static BufferedReader getBufferedReader(Socket clientSocket) {
+        BufferedReader in;
+        try {
+             in = new BufferedReader(
+                    new InputStreamReader(clientSocket.getInputStream()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return in;
+    }
+
+    private static Socket getClientSocket(ServerSocket serverSocket) {
+        Socket clientSocket;
+        try {
+            clientSocket = serverSocket.accept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return clientSocket;
+    }
+
+    private static ServerSocket getServerSocket() {
+        ServerSocket serverSocket;
+        try {
+            serverSocket = new ServerSocket(portNumber);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return serverSocket;
     }
 }

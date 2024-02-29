@@ -24,49 +24,17 @@ public class App
         serverSocket = getServerSocket();
 
         Socket clientSocket = null;
-        clientSocket = getClientSocket(serverSocket);
-        BufferedReader in;
-        in = getBufferedReader(clientSocket);
-        PrintWriter out = null;
-        out = getPrintWriter(out, clientSocket);
-        readerLoop(in, out);
+        clientSocket = accept(serverSocket);
+        ClientHandler ch = new ClientHandler(clientSocket);
+        ch.handle();
+
     }
 
-    private static void readerLoop(BufferedReader in, PrintWriter out) {
-        String s = "";
-        try {
-            while ((s = in.readLine()) != null) {
-                System.out.println(s);
-                out.println(s.toUpperCase(Locale.ROOT));
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private static PrintWriter getPrintWriter(PrintWriter out, Socket clientSocket) {
-        try {
-             out = new PrintWriter(clientSocket.getOutputStream(),
-                    true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return out;
-    }
 
-    private static BufferedReader getBufferedReader(Socket clientSocket) {
-        BufferedReader in;
-        try {
-             in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return in;
-    }
 
-    private static Socket getClientSocket(ServerSocket serverSocket) {
+    private static Socket accept(ServerSocket serverSocket) {
         Socket clientSocket;
         try {
             clientSocket = serverSocket.accept();
